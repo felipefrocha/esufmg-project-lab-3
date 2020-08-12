@@ -16,7 +16,7 @@ e com 8 cm de altura, para uma distância de 8
 ## Progrma interface interna
 A API Interna foi utilizada inicialmente como uma ferramenta de validação da mecanica e da fase inicial da simulação.
 O programa escrito em lua e utilizando um interpretador de XML em tempo real para criar interfaces GUI, pode ser encontrado em 
-[controCraneWindow](/controlCraneWindow.lua)
+[controCraneWindow](/codeLua/controlCraneWindow.lua)
 
 
 ## GUI Tkinter em Python
@@ -26,5 +26,5 @@ utilizados pela interface Python.
 ### Componentes de sistema
 Para que seja possivel comunicar com a API Remota e manipular os objetos disponiveis em tela fez necessário criar uma script
 thread, que levanta um serviço de escuta socket em uma porta especificada. Dessa forma é possível manipular os objetos de tela.
-O programa de serviço socket esta no arquivo [tese](/teste.lua)
+O programa de serviço socket esta no arquivo [tese](/codeLua/teste.lua)
 
