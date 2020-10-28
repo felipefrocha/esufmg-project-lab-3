@@ -1,6 +1,9 @@
 import math
+import threading
+import time
 from tkinter import *
 from tkinter import messagebox
+import os
 
 from PIL import ImageTk, Image
 
@@ -27,7 +30,7 @@ class Client:
         self.stepCounter = 0
         self.lastImageAcquisitionTime = -1
         sim.simxFinish(-1)  # just in case, close all opened connections
-        self.id = sim.simxStart('192.168.15.50', 19999, True, True, 5000, 5)  # Connect to CoppeliaSim
+        self.id = sim.simxStart('192.168.15.55', 19999, True, True, 5000, 5)  # Connect to CoppeliaSim
         return self
 
     def __exit__(self, *err):
@@ -106,9 +109,11 @@ def main():
     # button_right = Button(frame_control, text="Open", command=lambda: open_window())
     # get_ufmg_image(frame_control)
     slider(frame_control)
-    # button_right.grid(row=0, column=1)
+    teste = Label(root, width=5, textvariable=listener_variable['distance'])
     frame_control.grid(row=1, column=0, sticky=W + E)
     get_footer(root)
+    teste.grid(row=7, column=0, columnspan=3, sticky=W + E)
+
     mainloop()
 
 
@@ -119,7 +124,9 @@ def get_footer(root):
 
 def get_title(root):
     root.title('Lab Projetos 3 - Controladora teleoperada de Grua')
-    root.iconbitmap('./assets/index.ico')
+    print(f'{os.getcwd()}/assets/index.ico')
+    # path = os.getcwd()+'/assets/index.ico'
+    # root.iconbitmap(path)
 
 
 def get_ufmg_image(root):
@@ -192,12 +199,31 @@ def activate_magnet(teste):
         print("Code error is {}".format(err_code))
 
 
+def laiser_pointer(listVar):
+    #sim.simxGetFloatSignal(client.id, "laserDistance", sim.simx_opmode_streaming)
+    while 1:
+        time.sleep(1.5)
+        try:
+            err_code, distance = sim.simxGetFloatSignal(client.id, "laserPointerData", sim.simx_opmode_streaming)
+            print(f'Distancia {distance}')
+            listVar['distance'] = distance
+            if err_code != 0:
+                raise Exception("teste")
+        except Exception:
+            print("Code error is {}".format(err_code))
+
+
 if __name__ == "__main__":
     with Client() as client:
         client.runInSynchronousMode = True
         print("running")
         if client.id != -1:
             print('Connected to remote API server')
+            listener_variable = {"distance": 0}
+            threads = [threading.Thread(target=laiser_pointer, args=(listener_variable))]
+            [ i.start() for i in threads]
             main()
+            for i in threads:
+                i.join()
         else:
             raise Exception("THis was not possible!")
